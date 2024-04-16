@@ -8,10 +8,23 @@ function App() {
 
 	const [dealerCards, setDealerCards] = useState([]);
 	const [playerCards, setPlayerCards] = useState([]);
+	const [playersSum, setPlayersSum] = useState(0);
+	const [dealersSum, setDealersSum] = useState(0);
+	const [gameStatus, setGameStatus] = useState("");
 
 	useEffect(() => {
-		console.log("cards", cards);
-	}, [cards]);
+		checkGameStatus();
+	}, [playerCards]);
+
+	const addCard = () => {
+		const newCard = randomCardGenerate();
+
+		setCards((prevCards) => {
+			const newCards = prevCards.filter((card) => card.id !== newCard.id);
+			return newCards;
+		});
+		setPlayerCards([...playerCards, newCard]);
+	};
 
 	const randomCardGenerate = () => {
 		const randomId = Math.floor(Math.random() * 51);
@@ -22,6 +35,27 @@ function App() {
 		}
 
 		return newRandomCard;
+	};
+
+	const checkGameStatus = () => {
+		if (playerCards.length > 1) {
+			let playersSum = 0;
+			for (let card of playerCards) {
+				playersSum += card.points;
+			}
+			setPlayersSum(playersSum);
+			console.log("playersSum", playersSum);
+			const dealersSum = dealerCards[0].points;
+			setDealersSum(dealersSum);
+
+			if (playerCards.length === 2 && playersSum === 21)
+				setGameStatus("player black jack");
+			if (playersSum > 21) setGameStatus("player bust");
+
+			if (dealerCards.length === 2 && dealersSum === 21)
+				setGameStatus("dealer black jack");
+			if (dealersSum > 21) setGameStatus("dealer bust");
+		}
 	};
 
 	const startGame = () => {
@@ -56,6 +90,7 @@ function App() {
 		<div className="table-container">
 			<button onClick={startGame}>Start</button>
 			<div className="dealer container">
+				<span>{dealersSum}</span>
 				{dealerCards.map((card) => (
 					<img className="card" key={card.id} src={card.img} alt="" />
 				))}
@@ -64,7 +99,20 @@ function App() {
 				{playerCards.map((card) => (
 					<img className="card" key={card.id} src={card.img} alt="" />
 				))}
+				<span>{playersSum}</span>
 			</div>
+			<p>{gameStatus}</p>
+			<button
+				disabled={
+					gameStatus === "dealer bust" ||
+					gameStatus === "player bust" ||
+					gameStatus === "player black jack" ||
+					gameStatus === "dealer black jack"
+				}
+				onClick={addCard}
+			>
+				Add card
+			</button>
 		</div>
 	);
 }
