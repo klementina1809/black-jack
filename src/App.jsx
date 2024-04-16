@@ -78,9 +78,7 @@ function App() {
 				return newCards;
 			});
 			setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
-			sum += newCard.points; // Обновляем сумму
-
-			// Обновляем сумму после добавления карты
+			sum += newCard.points; 
 			setDealersSum(sum);
 		}
 	};
