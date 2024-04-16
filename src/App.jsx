@@ -25,9 +25,17 @@ function App() {
 	};
 
 	const startGame = () => {
-		const cardForDealer = randomCardGenerate();
-		const card1ForPlayer = randomCardGenerate();
-		const card2ForPlayer = randomCardGenerate();
+		let cardForDealer, card1ForPlayer, card2ForPlayer;
+
+		do {
+			cardForDealer = randomCardGenerate();
+			card1ForPlayer = randomCardGenerate();
+			card2ForPlayer = randomCardGenerate();
+		} while (
+			cardForDealer.id === card1ForPlayer.id ||
+			cardForDealer.id === card2ForPlayer.id ||
+			card1ForPlayer.id === card2ForPlayer.id
+		);
 
 		setDealerCards([cardForDealer]);
 
