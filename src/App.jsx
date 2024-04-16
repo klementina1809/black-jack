@@ -5,34 +5,47 @@ import "./App.css";
 
 function App() {
 	const [cards, setCards] = useState(playingCards);
-	const [randomCard, setRandomCard] = useState({});
+
 	const [dealerCards, setDealerCards] = useState([]);
 	const [playerCards, setPlayerCards] = useState([]);
 
+	useEffect(() => {
+		console.log("cards", cards);
+	}, [cards]);
+
 	const randomCardGenerate = () => {
-		const randomId = Math.floor(Math.random() * 52);
+		const randomId = Math.floor(Math.random() * 51);
 		const newRandomCard = cards.find((card) => card.id === randomId);
 
 		if (!newRandomCard) {
 			return randomCardGenerate();
 		}
-		setRandomCard(newRandomCard);
 
-		const newCards = cards.filter((card) => card.id !== randomId);
-		setCards(newCards);
 		return newRandomCard;
 	};
 
 	const startGame = () => {
 		const cardForDealer = randomCardGenerate();
-		const cardForPlayer1 = randomCardGenerate();
-		const cardForPlayer2 = randomCardGenerate();
+		const card1ForPlayer = randomCardGenerate();
+		const card2ForPlayer = randomCardGenerate();
+
 		setDealerCards([cardForDealer]);
-		setPlayerCards([cardForPlayer1, cardForPlayer2]);
+
+		setCards((prevCards) => {
+			const newCards = prevCards.filter(
+				(card) =>
+					card.id !== cardForDealer.id &&
+					card.id !== card1ForPlayer.id &&
+					card.id !== card2ForPlayer.id
+			);
+			return newCards;
+		});
+
+		setPlayerCards([card1ForPlayer, card2ForPlayer]);
 	};
 
 	return (
-		<>
+		<div className="table-container">
 			<button onClick={startGame}>Start</button>
 			<div className="dealer container">
 				{dealerCards.map((card) => (
@@ -44,7 +57,7 @@ function App() {
 					<img className="card" key={card.id} src={card.img} alt="" />
 				))}
 			</div>
-		</>
+		</div>
 	);
 }
 

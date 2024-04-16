@@ -1,15 +1,21 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+}
+.table-container {
+	display: flex;
+	flex-direction: column;
+	gap: 50px;
 }
 .container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: auto;
 }
 
 .card {
-  width: 85px;
+	width: 85px;
 }
