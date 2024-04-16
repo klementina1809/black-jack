@@ -14,17 +14,7 @@ function App() {
 
 	useEffect(() => {
 		checkGameStatus();
-	}, [playerCards]);
-
-	const addCard = () => {
-		const newCard = randomCardGenerate();
-
-		setCards((prevCards) => {
-			const newCards = prevCards.filter((card) => card.id !== newCard.id);
-			return newCards;
-		});
-		setPlayerCards([...playerCards, newCard]);
-	};
+	}, [playerCards, dealerCards]);
 
 	const randomCardGenerate = () => {
 		const randomId = Math.floor(Math.random() * 51);
@@ -38,27 +28,67 @@ function App() {
 	};
 
 	const checkGameStatus = () => {
-		if (playerCards.length > 1) {
+		if (playerCards.length > 0) {
 			let playersSum = 0;
 			for (let card of playerCards) {
 				playersSum += card.points;
 			}
 			setPlayersSum(playersSum);
-			console.log("playersSum", playersSum);
-			const dealersSum = dealerCards[0].points;
+
+			let dealersSum = 0;
+			for (let card of dealerCards) {
+				dealersSum += card.points;
+			}
 			setDealersSum(dealersSum);
 
+			if (dealersSum >= 17 && dealersSum > playersSum)
+				setGameStatus("dealer win");
+			if (dealersSum >= 17 && dealersSum < playersSum)
+				setGameStatus("player win");
+			if (dealersSum >= 17 && dealersSum == playersSum)
+				setGameStatus("push");
 			if (playerCards.length === 2 && playersSum === 21)
-				setGameStatus("player black jack");
-			if (playersSum > 21) setGameStatus("player bust");
+				setGameStatus("player black jack, player win");
+			if (playersSum > 21) setGameStatus("player bust, player lost");
 
 			if (dealerCards.length === 2 && dealersSum === 21)
-				setGameStatus("dealer black jack");
-			if (dealersSum > 21) setGameStatus("dealer bust");
+				setGameStatus("dealer black jack, player lost");
+			if (dealersSum > 21) setGameStatus("dealer bust, player win");
+		}
+	};
+
+	const addCard = () => {
+		const newCard = randomCardGenerate();
+
+		setCards((prevCards) => {
+			const newCards = prevCards.filter((card) => card.id !== newCard.id);
+			return newCards;
+		});
+		setPlayerCards([...playerCards, newCard]);
+	};
+
+	const handleStay = () => {
+		let sum = dealersSum;
+		while (sum < 17) {
+			const newCard = randomCardGenerate();
+			setCards((prevCards) => {
+				const newCards = prevCards.filter(
+					(card) => card.id !== newCard.id
+				);
+				return newCards;
+			});
+			setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
+			sum += newCard.points; // Обновляем сумму
+
+			// Обновляем сумму после добавления карты
+			setDealersSum(sum);
 		}
 	};
 
 	const startGame = () => {
+		setGameStatus("");
+		setDealersSum(0);
+		setDealersSum(0);
 		let cardForDealer, card1ForPlayer, card2ForPlayer;
 
 		do {
@@ -96,23 +126,38 @@ function App() {
 				))}
 			</div>
 			<div className="player container">
+				<span>{playersSum}</span>
 				{playerCards.map((card) => (
 					<img className="card" key={card.id} src={card.img} alt="" />
 				))}
-				<span>{playersSum}</span>
 			</div>
 			<p>{gameStatus}</p>
-			<button
-				disabled={
-					gameStatus === "dealer bust" ||
-					gameStatus === "player bust" ||
-					gameStatus === "player black jack" ||
-					gameStatus === "dealer black jack"
-				}
-				onClick={addCard}
-			>
-				Add card
-			</button>
+			<div className="options-bar">
+				<button
+					disabled={
+						playersSum === 0 ||
+						gameStatus === "dealer bust" ||
+						gameStatus === "player bust" ||
+						gameStatus === "player black jack" ||
+						gameStatus === "dealer black jack"
+					}
+					onClick={addCard}
+				>
+					Hit
+				</button>
+				<button
+					disabled={
+						playersSum === 0 ||
+						gameStatus === "dealer bust" ||
+						gameStatus === "player bust" ||
+						gameStatus === "player black jack" ||
+						gameStatus === "dealer black jack"
+					}
+					onClick={handleStay}
+				>
+					Stay
+				</button>
+			</div>
 		</div>
 	);
 }

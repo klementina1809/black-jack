@@ -19,3 +19,10 @@
 .card {
 	width: 85px;
 }
+
+.options-bar {
+	display: flex;
+
+	gap: 20px;
+	margin: auto;
+}
