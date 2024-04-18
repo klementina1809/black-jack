@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import playingCards from "./components/Cards";
+import playingCards from "./components/CardsTry";
 
 import "./App.css";
 
@@ -13,7 +13,7 @@ function App() {
 	const [gameStatus, setGameStatus] = useState("");
 
 	useEffect(() => {
-		checkGameStatus();
+		if (playerCards.length > 0) checkGameStatus();
 	}, [playerCards, dealerCards]);
 
 	const randomCardGenerate = () => {
@@ -27,33 +27,96 @@ function App() {
 		return newRandomCard;
 	};
 
-	const checkGameStatus = () => {
-		if (playerCards.length > 0) {
-			let playersSum = 0;
-			for (let card of playerCards) {
-				playersSum += card.points;
-			}
-			setPlayersSum(playersSum);
+	const checkPlayerStatus = () => {
+		let playersSum = 0;
+		const totalSum = playerCards.reduce((acc, cur) => {
+			return acc + cur.points;
+		}, 0);
+		for (let card of playerCards) {
+			let points;
+			if (totalSum > 21 && card.rank == "A") {
+				points = 1;
+			} else points = card.points;
+			console.log('points',points);
+			playersSum += points;
+		}
+		return playersSum;
+	};
 
-			let dealersSum = 0;
+	// const checkPlayerStatus = () => {
+	// 	let playersSum = 0;
+	// 	const totalSum = playerCards.reduce((acc, cur) => {
+	// 		return acc + cur.points;
+	// 	}, 0);
+	// 	if (playerCards.some((card) => card.rank === "A") && totalSum > 21) {
+	// 		for (let card of playerCards) {
+	// 			let points = aceControl(card, playersSum, totalSum, 1);
+	// 			playersSum += points;
+	// 		}
+	// 	} else {
+	// 		for (let card of playerCards) {
+	// 			let points = aceControl(card, playersSum, totalSum, 11);
+	// 			playersSum += points;
+	// 		}
+	// 	}
+	// 	console.log('playersSum',playersSum);
+	// 	return playersSum;
+	// };
+
+	const checkDealerStatus = () => {
+		let dealersSum = 0;
+		const totalSum = dealerCards.reduce((acc, cur) => {
+			return acc + cur.points;
+		}, 0);
+
+		if (dealerCards.some((card) => card.rank === "A") && totalSum > 21) {
 			for (let card of dealerCards) {
-				dealersSum += card.points;
+				let points = aceControl(card, dealersSum, totalSum, 1);
+				dealersSum += points;
 			}
-			setDealersSum(dealersSum);
+		} else {
+			for (let card of dealerCards) {
+				let points = aceControl(card, dealersSum, totalSum, 11);
+				dealersSum += points;
+			}
+		}
 
-			if (dealersSum >= 17 && dealersSum > playersSum)
-				setGameStatus("dealer win");
-			if (dealersSum >= 17 && dealersSum < playersSum)
-				setGameStatus("player win");
-			if (dealersSum >= 17 && dealersSum == playersSum)
-				setGameStatus("push");
-			if (playerCards.length === 2 && playersSum === 21)
-				setGameStatus("player black jack, player win");
-			if (playersSum > 21) setGameStatus("player bust, player lost");
+		return dealersSum;
+	};
 
-			if (dealerCards.length === 2 && dealersSum === 21)
-				setGameStatus("dealer black jack, player lost");
-			if (dealersSum > 21) setGameStatus("dealer bust, player win");
+	const checkGameStatus = () => {
+		const playersSum = checkPlayerStatus();
+		setPlayersSum(playersSum);
+		const dealersSum = checkDealerStatus();
+		setDealersSum(dealersSum);
+
+		if (dealersSum >= 17 && dealersSum > playersSum)
+			setGameStatus("dealer win");
+		else if (dealersSum >= 17 && dealersSum < playersSum)
+			setGameStatus("player win");
+		else if (dealersSum >= 17 && dealersSum == playersSum)
+			setGameStatus("push");
+
+		if (playerCards.length === 2 && playersSum === 21)
+			setGameStatus("player black jack, player win");
+		if (playersSum > 21) setGameStatus("player bust, player lost");
+
+		if (dealerCards.length === 2 && dealersSum === 21)
+			setGameStatus("dealer black jack, player lost");
+		if (dealersSum > 21) setGameStatus("dealer bust, player win");
+	};
+
+	const aceControl = (card, currentSum, totalSum, ace) => {
+		if (card.rank === "A") {
+			if (currentSum + 11 <= 21) {
+				return ace;
+			} else {
+				console.log("currentSum", currentSum);
+				return 1;
+			}
+			// return sum + 11 <= 21 ? card.points[1] : card.points[0];
+		} else {
+			return card.points;
 		}
 	};
 
@@ -78,7 +141,7 @@ function App() {
 				return newCards;
 			});
 			setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
-			sum += newCard.points; 
+			sum += newCard.points;
 			setDealersSum(sum);
 		}
 	};
