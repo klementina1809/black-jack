@@ -149,9 +149,9 @@ function App() {
 			<div className="cards-container">
 				<div className="dealer container">
 					<span>{dealersSum}</span>
-					{dealerCards.map((card) => (
+					{dealerCards.map((card, index) => (
 						<img
-							className="card"
+						className={`card ${index === dealerCards.length - 1 ? "card-appear-animation card" : "card"}`}
 							key={card.id}
 							src={card.img}
 							alt=""
@@ -162,7 +162,7 @@ function App() {
 					<span>{playersSum}</span>
 					{playerCards.map((card) => (
 						<img
-							className="card"
+						className={"card-appear-animation card"}
 							key={card.id}
 							src={card.img}
 							alt=""
