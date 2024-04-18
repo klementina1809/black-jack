@@ -12,7 +12,7 @@ function App() {
 	const [playersSum, setPlayersSum] = useState(0);
 	const [dealersSum, setDealersSum] = useState(0);
 	const [gameStatus, setGameStatus] = useState("");
-	const [bet, setBet] = useState(10);
+	const [bet, setBet] = useState(0);
 	const [credit, setCredit] = useState(1000);
 	const [win, setWin] = useState(0);
 
@@ -25,27 +25,26 @@ function App() {
 				setDealersSum,
 				setGameStatus
 			);
-		// checkGameStatus(playerCards, dealerCards, setPlayersSum, setDealersSum);
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {
-		if (gameStatus !== "") creditsCalculate(gameStatus);
+		if (gameStatus !== "") {
+			creditsCalculate(gameStatus);
+			setBet(0);
+		}
 	}, [gameStatus]);
 
 	const randomCardGenerate = () => {
 		const randomId = Math.floor(Math.random() * 51);
 		const newRandomCard = cards.find((card) => card.id === randomId);
-
 		if (!newRandomCard) {
 			return randomCardGenerate();
 		}
-
 		return newRandomCard;
 	};
 
 	const addCard = () => {
 		const newCard = randomCardGenerate();
-
 		setCards((prevCards) => {
 			const newCards = prevCards.filter((card) => card.id !== newCard.id);
 			return newCards;
@@ -151,7 +150,11 @@ function App() {
 					<span>{dealersSum}</span>
 					{dealerCards.map((card, index) => (
 						<img
-						className={`card ${index === dealerCards.length - 1 ? "card-appear-animation card" : "card"}`}
+							className={`card ${
+								index === dealerCards.length - 1
+									? "card-appear-animation card"
+									: "card"
+							}`}
 							key={card.id}
 							src={card.img}
 							alt=""
@@ -162,7 +165,7 @@ function App() {
 					<span>{playersSum}</span>
 					{playerCards.map((card) => (
 						<img
-						className={"card-appear-animation card"}
+							className={"card-appear-animation card"}
 							key={card.id}
 							src={card.img}
 							alt=""
@@ -199,7 +202,9 @@ function App() {
 					)}
 					<input type="number" value={bet} readOnly />
 				</div>
-				<button onClick={startGame}>Start</button>
+				<button onClick={startGame} disabled={bet === 0}>
+					Start
+				</button>
 			</div>
 			<div className="chips">
 				<div className="chip" data-value="10">
