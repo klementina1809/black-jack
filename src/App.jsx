@@ -54,18 +54,27 @@ function App() {
 
 	const handleStay = () => {
 		let sum = dealersSum;
-		while (sum < 17) {
-			const newCard = randomCardGenerate();
-			setCards((prevCards) => {
-				const newCards = prevCards.filter(
-					(card) => card.id !== newCard.id
-				);
-				return newCards;
-			});
-			setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
-			sum += newCard.points;
-			setDealersSum(sum);
-		}
+		const dealerDraw = () => {
+			if (sum < 17) {
+				setTimeout(() => {
+					const newCard = randomCardGenerate();
+					setCards((prevCards) => {
+						const newCards = prevCards.filter(
+							(card) => card.id !== newCard.id
+						);
+						return newCards;
+					});
+					setDealerCards((prevDealerCards) => [
+						...prevDealerCards,
+						newCard,
+					]);
+					sum += newCard.points;
+					setDealersSum(sum);
+					dealerDraw(); // Рекурсивный вызов для следующей карты
+				}, 600);
+			}
+		};
+		dealerDraw(); // Начать рекурсивный процесс
 	};
 
 	const startGame = () => {
@@ -135,19 +144,23 @@ function App() {
 
 	return (
 		<div className="table-container">
-			<div className="row-container">
+			<div className="row-container gold">
 				<div className="input-container">
-					<span>Credits</span>
-					<input type="number" value={credit} readOnly />
+					<h3>Credits</h3>
+					<h3>{credit}</h3>
 				</div>
 				<div className="input-container">
-					<span>Win</span>
-					<input type="number" value={win} readOnly />
+					<h3>Win</h3>
+					<h3>{win}</h3>
+				</div>
+				<div className="input-container">
+					<h3>Bet</h3>
+					<h3>{bet}</h3>
 				</div>
 			</div>
 			<div className="cards-container">
 				<div className="dealer container">
-					<span>{dealersSum}</span>
+					<h2>DEALER {' '} {dealersSum} </h2>
 					{dealerCards.map((card, index) => (
 						<img
 							className={`card ${
@@ -162,7 +175,7 @@ function App() {
 					))}
 				</div>
 				<div className="player container">
-					<span>{playersSum}</span>
+					<h2>PLAYER {playersSum}</h2>
 					{playerCards.map((card) => (
 						<img
 							className={"card-appear-animation card"}
@@ -173,7 +186,7 @@ function App() {
 					))}
 				</div>
 			</div>
-			<p>{gameStatus}</p>
+			<h3 className="message">{gameStatus}</h3>
 			<div className="options-bar">
 				<button
 					disabled={playersSum === 0 || gameStatus !== ""}
@@ -195,18 +208,18 @@ function App() {
 				</button>
 			</div>
 			<div className="row-container">
-				<div className="input-container">
-					<span>Bet</span>
-					{credit - bet < 0 && (
-						<span>You can't play, decrease the bet amount</span>
-					)}
-					<input type="number" value={bet} readOnly />
-				</div>
-				<button onClick={startGame} disabled={bet === 0}>
-					Start
+				<button
+					className="play"
+					onClick={startGame}
+					disabled={bet === 0}
+				>
+					Play
 				</button>
 			</div>
 			<div className="chips">
+				{credit - bet < 0 && (
+					<span>You can't play, decrease the bet amount</span>
+				)}
 				<div className="chip" data-value="10">
 					<img src="./img/10.png" alt="" onClick={() => setBet(10)} />
 				</div>
