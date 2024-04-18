@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import playingCards from "./components/CardsTry";
+import playingCards from "./components/Cards";
 
 import "./App.css";
 
@@ -18,7 +18,7 @@ function App() {
 	useEffect(() => {
 		if (playerCards.length > 0) checkGameStatus();
 	}, [playerCards, dealerCards]);
-	
+
 	useEffect(() => {
 		if (gameStatus !== "") creditsCalculate(gameStatus);
 	}, [gameStatus]);
@@ -115,6 +115,7 @@ function App() {
 	const startGame = () => {
 		setCredit((prev) => prev - bet);
 		setGameStatus("");
+		setWin(0);
 		setDealersSum(0);
 		setDealersSum(0);
 		let cardForDealer, card1ForPlayer, card2ForPlayer;
@@ -179,6 +180,41 @@ function App() {
 					<input type="number" value={win} readOnly />
 				</div>
 			</div>
+			<div className="cards-container">
+				<div className="dealer container">
+					<span>{dealersSum}</span>
+					{dealerCards.map((card) => (
+						<img className="card" key={card.id} src={card.img} alt="" />
+					))}
+				</div>
+				<div className="player container">
+					<span>{playersSum}</span>
+					{playerCards.map((card) => (
+						<img className="card" key={card.id} src={card.img} alt="" />
+					))}
+				</div>
+			</div>
+			<p>{gameStatus}</p>
+			<div className="options-bar">
+				<button
+					disabled={
+						playersSum === 0 ||
+						gameStatus !== "" 
+					}
+					onClick={addCard}
+				>
+					Hit
+				</button>
+				<button
+					disabled={
+						playersSum === 0 ||
+						gameStatus !== "" 
+					}
+					onClick={handleStay}
+				>
+					Stay
+				</button>
+			</div>
 			<div className="row-container">
 				<div className="input-container">
 					<span>Bet</span>
@@ -188,45 +224,6 @@ function App() {
 					<input type="number" value={bet} readOnly />
 				</div>
 				<button onClick={startGame}>Start</button>
-			</div>
-			<div className="dealer container">
-				<span>{dealersSum}</span>
-				{dealerCards.map((card) => (
-					<img className="card" key={card.id} src={card.img} alt="" />
-				))}
-			</div>
-			<div className="player container">
-				<span>{playersSum}</span>
-				{playerCards.map((card) => (
-					<img className="card" key={card.id} src={card.img} alt="" />
-				))}
-			</div>
-			<p>{gameStatus}</p>
-			<div className="options-bar">
-				<button
-					disabled={
-						playersSum === 0 ||
-						gameStatus === "dealer bust" ||
-						gameStatus === "player bust" ||
-						gameStatus === "player black jack" ||
-						gameStatus === "dealer black jack"
-					}
-					onClick={addCard}
-				>
-					Hit
-				</button>
-				<button
-					disabled={
-						playersSum === 0 ||
-						gameStatus === "dealer bust" ||
-						gameStatus === "player bust" ||
-						gameStatus === "player black jack" ||
-						gameStatus === "dealer black jack"
-					}
-					onClick={handleStay}
-				>
-					Stay
-				</button>
 			</div>
 			<div className="chips">
 				<div className="chip" data-value="10">
