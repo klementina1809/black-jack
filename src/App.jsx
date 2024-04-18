@@ -11,10 +11,17 @@ function App() {
 	const [playersSum, setPlayersSum] = useState(0);
 	const [dealersSum, setDealersSum] = useState(0);
 	const [gameStatus, setGameStatus] = useState("");
+	const [bet, setBet] = useState(10);
+	const [credit, setCredit] = useState(1000);
+	const [win, setWin] = useState(0);
 
 	useEffect(() => {
 		if (playerCards.length > 0) checkGameStatus();
 	}, [playerCards, dealerCards]);
+	
+	useEffect(() => {
+		if (gameStatus !== "") creditsCalculate(gameStatus);
+	}, [gameStatus]);
 
 	const randomCardGenerate = () => {
 		const randomId = Math.floor(Math.random() * 51);
@@ -37,50 +44,23 @@ function App() {
 			if (totalSum > 21 && card.rank == "A") {
 				points = 1;
 			} else points = card.points;
-			console.log('points',points);
 			playersSum += points;
 		}
 		return playersSum;
 	};
-
-	// const checkPlayerStatus = () => {
-	// 	let playersSum = 0;
-	// 	const totalSum = playerCards.reduce((acc, cur) => {
-	// 		return acc + cur.points;
-	// 	}, 0);
-	// 	if (playerCards.some((card) => card.rank === "A") && totalSum > 21) {
-	// 		for (let card of playerCards) {
-	// 			let points = aceControl(card, playersSum, totalSum, 1);
-	// 			playersSum += points;
-	// 		}
-	// 	} else {
-	// 		for (let card of playerCards) {
-	// 			let points = aceControl(card, playersSum, totalSum, 11);
-	// 			playersSum += points;
-	// 		}
-	// 	}
-	// 	console.log('playersSum',playersSum);
-	// 	return playersSum;
-	// };
 
 	const checkDealerStatus = () => {
 		let dealersSum = 0;
 		const totalSum = dealerCards.reduce((acc, cur) => {
 			return acc + cur.points;
 		}, 0);
-
-		if (dealerCards.some((card) => card.rank === "A") && totalSum > 21) {
-			for (let card of dealerCards) {
-				let points = aceControl(card, dealersSum, totalSum, 1);
-				dealersSum += points;
-			}
-		} else {
-			for (let card of dealerCards) {
-				let points = aceControl(card, dealersSum, totalSum, 11);
-				dealersSum += points;
-			}
+		for (let card of dealerCards) {
+			let points;
+			if (totalSum > 21 && card.rank == "A") {
+				points = 1;
+			} else points = card.points;
+			dealersSum += points;
 		}
-
 		return dealersSum;
 	};
 
@@ -91,9 +71,9 @@ function App() {
 		setDealersSum(dealersSum);
 
 		if (dealersSum >= 17 && dealersSum > playersSum)
-			setGameStatus("dealer win");
+			setGameStatus("Dealer win");
 		else if (dealersSum >= 17 && dealersSum < playersSum)
-			setGameStatus("player win");
+			setGameStatus("Player win");
 		else if (dealersSum >= 17 && dealersSum == playersSum)
 			setGameStatus("push");
 
@@ -104,20 +84,6 @@ function App() {
 		if (dealerCards.length === 2 && dealersSum === 21)
 			setGameStatus("dealer black jack, player lost");
 		if (dealersSum > 21) setGameStatus("dealer bust, player win");
-	};
-
-	const aceControl = (card, currentSum, totalSum, ace) => {
-		if (card.rank === "A") {
-			if (currentSum + 11 <= 21) {
-				return ace;
-			} else {
-				console.log("currentSum", currentSum);
-				return 1;
-			}
-			// return sum + 11 <= 21 ? card.points[1] : card.points[0];
-		} else {
-			return card.points;
-		}
 	};
 
 	const addCard = () => {
@@ -147,6 +113,7 @@ function App() {
 	};
 
 	const startGame = () => {
+		setCredit((prev) => prev - bet);
 		setGameStatus("");
 		setDealersSum(0);
 		setDealersSum(0);
@@ -177,9 +144,51 @@ function App() {
 		setPlayerCards([card1ForPlayer, card2ForPlayer]);
 	};
 
+	const creditsCalculate = (message) => {
+		let newCredits;
+		if (
+			message === "Dealer win" ||
+			message === "player bust, player lost" ||
+			message === "dealer black jack, player lost"
+		) {
+			newCredits = 0;
+		} else if (
+			message === "Player win" ||
+			message === "dealer bust, player win"
+		) {
+			newCredits = 2 * bet;
+		} else if (message === "player black jack, player win") {
+			newCredits = 2.5 * bet;
+		} else if (message === "push") {
+			newCredits = bet;
+		}
+		console.log("newCredits", newCredits);
+		setWin(newCredits);
+		setCredit((prev) => prev + newCredits);
+	};
+
 	return (
 		<div className="table-container">
-			<button onClick={startGame}>Start</button>
+			<div className="row-container">
+				<div className="input-container">
+					<span>Credits</span>
+					<input type="number" value={credit} readOnly />
+				</div>
+				<div className="input-container">
+					<span>Win</span>
+					<input type="number" value={win} readOnly />
+				</div>
+			</div>
+			<div className="row-container">
+				<div className="input-container">
+					<span>Bet</span>
+					{credit - bet < 0 && (
+						<span>You can't play, decrease the bet amount</span>
+					)}
+					<input type="number" value={bet} readOnly />
+				</div>
+				<button onClick={startGame}>Start</button>
+			</div>
 			<div className="dealer container">
 				<span>{dealersSum}</span>
 				{dealerCards.map((card) => (
@@ -218,6 +227,24 @@ function App() {
 				>
 					Stay
 				</button>
+			</div>
+			<div className="chips">
+				<div className="chip" data-value="10">
+					<img src="./img/10.png" alt="" onClick={() => setBet(10)} />
+				</div>
+				<div className="chip" data-value="20">
+					<img src="./img/20.png" alt="" onClick={() => setBet(20)} />
+				</div>
+				<div className="chip" data-value="50">
+					<img src="./img/50.png" alt="" onClick={() => setBet(50)} />
+				</div>
+				<div className="chip" data-value="100">
+					<img
+						src="./img/100.png"
+						alt=""
+						onClick={() => setBet(100)}
+					/>
+				</div>
 			</div>
 		</div>
 	);
