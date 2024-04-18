@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import playingCards from "./components/Cards";
+import checkGameStatus from "./components/CheckGameStatus";
 
 import "./App.css";
 
@@ -16,7 +17,15 @@ function App() {
 	const [win, setWin] = useState(0);
 
 	useEffect(() => {
-		if (playerCards.length > 0) checkGameStatus();
+		if (playerCards.length > 0)
+			checkGameStatus(
+				playerCards,
+				dealerCards,
+				setPlayersSum,
+				setDealersSum,
+				setGameStatus
+			);
+		// checkGameStatus(playerCards, dealerCards, setPlayersSum, setDealersSum);
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {
@@ -32,58 +41,6 @@ function App() {
 		}
 
 		return newRandomCard;
-	};
-
-	const checkPlayerStatus = () => {
-		let playersSum = 0;
-		const totalSum = playerCards.reduce((acc, cur) => {
-			return acc + cur.points;
-		}, 0);
-		for (let card of playerCards) {
-			let points;
-			if (totalSum > 21 && card.rank == "A") {
-				points = 1;
-			} else points = card.points;
-			playersSum += points;
-		}
-		return playersSum;
-	};
-
-	const checkDealerStatus = () => {
-		let dealersSum = 0;
-		const totalSum = dealerCards.reduce((acc, cur) => {
-			return acc + cur.points;
-		}, 0);
-		for (let card of dealerCards) {
-			let points;
-			if (totalSum > 21 && card.rank == "A") {
-				points = 1;
-			} else points = card.points;
-			dealersSum += points;
-		}
-		return dealersSum;
-	};
-
-	const checkGameStatus = () => {
-		const playersSum = checkPlayerStatus();
-		setPlayersSum(playersSum);
-		const dealersSum = checkDealerStatus();
-		setDealersSum(dealersSum);
-
-		if (dealersSum >= 17 && dealersSum > playersSum)
-			setGameStatus("Dealer win");
-		else if (dealersSum >= 17 && dealersSum < playersSum)
-			setGameStatus("Player win");
-		else if (dealersSum >= 17 && dealersSum == playersSum)
-			setGameStatus("push");
-
-		if (playerCards.length === 2 && playersSum === 21)
-			setGameStatus("player black jack, player win");
-		if (playersSum > 21) setGameStatus("player bust, player lost");
-
-		if (dealerCards.length === 2 && dealersSum === 21)
-			setGameStatus("dealer black jack, player lost");
-		if (dealersSum > 21) setGameStatus("dealer bust, player win");
 	};
 
 	const addCard = () => {
@@ -156,7 +113,8 @@ function App() {
 			newCredits = 0;
 		} else if (
 			message === "Player win" ||
-			message === "dealer bust, player win"
+			message === "dealer bust, player win" ||
+			message === "Player win and have black jack"
 		) {
 			newCredits = 2 * bet;
 		} else if (message === "player black jack, player win") {
