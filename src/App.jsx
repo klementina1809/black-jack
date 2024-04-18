@@ -113,6 +113,7 @@ function App() {
 	};
 
 	const startGame = () => {
+		setCards(playingCards);
 		setCredit((prev) => prev - bet);
 		setGameStatus("");
 		setWin(0);
@@ -168,6 +169,13 @@ function App() {
 		setCredit((prev) => prev + newCredits);
 	};
 
+	const handleDouble = () => {
+		setBet((prev) => prev * 2);
+		setCredit((prev) => prev - bet);
+		addCard();
+		handleStay();
+	};
+
 	return (
 		<div className="table-container">
 			<div className="row-container">
@@ -184,35 +192,45 @@ function App() {
 				<div className="dealer container">
 					<span>{dealersSum}</span>
 					{dealerCards.map((card) => (
-						<img className="card" key={card.id} src={card.img} alt="" />
+						<img
+							className="card"
+							key={card.id}
+							src={card.img}
+							alt=""
+						/>
 					))}
 				</div>
 				<div className="player container">
 					<span>{playersSum}</span>
 					{playerCards.map((card) => (
-						<img className="card" key={card.id} src={card.img} alt="" />
+						<img
+							className="card"
+							key={card.id}
+							src={card.img}
+							alt=""
+						/>
 					))}
 				</div>
 			</div>
 			<p>{gameStatus}</p>
 			<div className="options-bar">
 				<button
-					disabled={
-						playersSum === 0 ||
-						gameStatus !== "" 
-					}
+					disabled={playersSum === 0 || gameStatus !== ""}
 					onClick={addCard}
 				>
 					Hit
 				</button>
 				<button
-					disabled={
-						playersSum === 0 ||
-						gameStatus !== "" 
-					}
+					disabled={playersSum === 0 || gameStatus !== ""}
 					onClick={handleStay}
 				>
 					Stay
+				</button>
+				<button
+					disabled={playersSum === 0 || gameStatus !== ""}
+					onClick={handleDouble}
+				>
+					Double
 				</button>
 			</div>
 			<div className="row-container">
