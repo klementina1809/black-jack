@@ -17,14 +17,16 @@ function App() {
 	const [win, setWin] = useState(0);
 
 	useEffect(() => {
-		if (playerCards.length > 0)
-			checkGameStatus(
-				playerCards,
-				dealerCards,
-				setPlayersSum,
-				setDealersSum,
-				setGameStatus
-			);
+		if (playerCards.length > 0) {
+			const {
+				playersSum: pSum,
+				dealersSum: dSum,
+				gameStatus: gStatus,
+			} = checkGameStatus(playerCards, dealerCards);
+			setPlayersSum(pSum);
+			setDealersSum(dSum);
+			setGameStatus(gStatus);
+		}
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {

@@ -1,4 +1,4 @@
-const checkStatus = (cards) => {
+const getCardsSum = (cards) => {
 	let totalSum = cards.reduce((acc, cur) => {
 		return acc + cur.points;
 	}, 0);
@@ -12,32 +12,49 @@ const checkStatus = (cards) => {
 	return totalSum;
 };
 
-const checkGameStatus = (
-	playerCards,
-	dealerCards,
-	setPlayersSum,
-	setDealersSum,
-	setGameStatus
+const getMessage = (
+	playersSum,
+	dealersSum,
+	playerCardsLenght,
+	dealersCardLenght
 ) => {
-	const playersSum = checkStatus(playerCards);
-	setPlayersSum(playersSum);
-	const dealersSum = checkStatus(dealerCards);
-	setDealersSum(dealersSum);
+	if (playerCardsLenght === 2 && playersSum === 21) {
+		// se il dealer ha il numero 10 o l'A
+		// allora controllare la prossima carta del dealer
 
-	if (dealersSum >= 17 && dealersSum > playersSum) setGameStatus("Dealer win");
-	else if (dealersSum >= 17 && playersSum === 21)
-		setGameStatus("Player win and have black jack");
-	else if (dealersSum >= 17 && dealersSum < playersSum)
-		setGameStatus("Player win");
-	else if (dealersSum >= 17 && dealersSum == playersSum) setGameStatus("push");
+		// se il dealer ha blackjack
+		// allora push
 
-	if (playerCards.length === 2 && playersSum === 21)
-		setGameStatus("player black jack, player win");
-	if (playersSum > 21) setGameStatus("player bust, player lost");
+		// se il dealer non ha blackjack
+		// allora player win
 
-	if (dealerCards.length === 2 && dealersSum === 21)
-		setGameStatus("dealer black jack, player lost");
-	if (dealersSum > 21) setGameStatus("dealer bust, player win");
+		// se il dealer non ha il numero 10 o l'A
+		// allora player win
+		return "player black jack, dealer lost";
+	} else if (dealersCardLenght === 2 && dealersSum === 21)
+		return "dealer black jack, player lost";
+	else if (playersSum > 21) return "player bust, dealer win";
+	else if (dealersSum > 21) return "dealer bust, player win";
+	else if (dealersSum >= 17 && dealersSum > playersSum) return "dealer win";
+	else if (dealersSum >= 17 && dealersSum < playersSum) return "player win";
+	else if (dealersSum >= 17 && dealersSum == playersSum) return "push";
+};
+
+const checkGameStatus = (playerCards, dealerCards) => {
+	const playersSum = getCardsSum(playerCards);
+	const dealersSum = getCardsSum(dealerCards);
+	const gameStatus = getMessage(
+		playersSum,
+		dealersSum,
+		playerCards.length,
+		dealerCards.length
+	);
+
+	return {
+		playersSum,
+		dealersSum,
+		gameStatus,
+	};
 };
 
 export default checkGameStatus;
