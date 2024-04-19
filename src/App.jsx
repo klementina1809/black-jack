@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import playingCards from "./helpers/Cards";
 import checkGameStatus from "./helpers/CheckGameStatus";
 
+import Chips from "./components/Chips";
+import Cards from "./components/Cards";
+import InfoBox from "./components/InfoBox";
+import OptionsBox from "./components/OptionsBox";
+
 import "./App.css";
 
 function App() {
@@ -9,22 +14,22 @@ function App() {
 
 	const [dealerCards, setDealerCards] = useState([]);
 	const [playerCards, setPlayerCards] = useState([]);
-	const [playersSum, setPlayersSum] = useState(0);
-	const [dealersSum, setDealersSum] = useState(0);
+	const [playerSum, setPlayerSum] = useState(0);
+	const [dealerSum, setDealerSum] = useState(0);
 	const [gameStatus, setGameStatus] = useState("");
 	const [bet, setBet] = useState(0);
-	const [credit, setCredit] = useState(1000);
-	const [win, setWin] = useState(0);
+	const [credits, setCredits] = useState(1000);
+	const [lastWinCredits, setLastWinCredits] = useState(0);
 
 	useEffect(() => {
 		if (playerCards.length > 0) {
 			const {
-				playersSum: pSum,
-				dealersSum: dSum,
+				playerSum: pSum,
+				dealerSum: dSum,
 				gameStatus: gStatus,
 			} = checkGameStatus(playerCards, dealerCards);
-			setPlayersSum(pSum);
-			setDealersSum(dSum);
+			setPlayerSum(pSum);
+			setDealerSum(dSum);
 			setGameStatus(gStatus);
 		}
 	}, [playerCards, dealerCards]);
@@ -55,14 +60,17 @@ function App() {
 	};
 
 	const handleStay = () => {
-		let sum = dealersSum;
+		let sum = dealerSum;
 		const dealerDraw = () => {
 			if (sum < 17) {
 				setTimeout(() => {
 					const newCard = addCard();
-					setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
+					setDealerCards((prevDealerCards) => [
+						...prevDealerCards,
+						newCard,
+					]);
 					sum += newCard.points;
-					setDealersSum(sum);
+					setDealerSum(sum);
 					if (sum < 17) dealerDraw();
 				}, 600);
 			}
@@ -74,15 +82,15 @@ function App() {
 		setCards(playingCards);
 		setDealerCards([]);
 		setPlayerCards([]);
-		setPlayersSum(0);
-		setDealersSum(0);
+		setPlayerSum(0);
+		setDealerSum(0);
 		setGameStatus("");
-		setWin(0);
+		setLastWinCredits(0);
 	};
 
 	const startGame = () => {
 		resetGame();
-		setCredit((prev) => prev - bet);
+		setCredits((prev) => prev - bet);
 
 		let dealerCard, playerCard1, playerCard2;
 
@@ -117,47 +125,47 @@ function App() {
 		/*
 		switch (gameStatus) {
 			case "PLAYER_BLACKJACK":
-				winCredits = 2.5 * bet;
+				wincreditss = 2.5 * bet;
 				break;
 			case "DEALER_BLACKJACK":
 			case "DEALER_WIN":
 			case "PLAYER_BUST":
-				winCredits = 0;
+				wincreditss = 0;
 				break;
 			case "PLAYER_WIN":
 			case "DEALER_BUST":
-				winCredits = 2 * bet;
+				wincreditss = 2 * bet;
 				break;
 			case "PUSH":
-				winCredits = bet;
+				wincreditss = bet;
 				break;
 		}
 		*/
 
-		let newCredits = 0;
+		let winCredits = 0;
 		if (
 			message === "Dealer win" ||
 			message === "player bust, player lost" ||
 			message === "dealer black jack, player lost"
 		) {
-			newCredits = 0;
+			winCredits = 0;
 		} else if (
 			message === "Player win" ||
 			message === "dealer bust, player win" ||
 			message === "Player win and have black jack"
 		) {
-			newCredits = 2 * bet;
+			winCredits = 2 * bet;
 		} else if (message === "player black jack, player win") {
-			newCredits = 2.5 * bet;
+			winCredits = 2.5 * bet;
 		} else if (message === "push") {
-			newCredits = bet;
+			winCredits = bet;
 		}
-		setWin(newCredits);
-		setCredit((prev) => prev + newCredits);
+		setLastWinCredits(winCredits);
+		setCredits((prev) => prev + winCredits);
 	};
 
 	const handleDouble = () => {
-		setCredit((prev) => prev - bet * 2);
+		setCredits((prev) => prev - bet * 2);
 		setBet(bet * 2);
 		const newCard = addCard();
 		setPlayerCards([...playerCards, newCard]);
@@ -166,94 +174,37 @@ function App() {
 
 	return (
 		<div className="table-container">
-			<div className="row-container gold">
-				<div className="input-container">
-					<h3>Credits</h3>
-					<h3>{credit}</h3>
-				</div>
-				<div className="input-container">
-					<h3>Win</h3>
-					<h3>{win}</h3>
-				</div>
-				<div className="input-container">
-					<h3>Bet</h3>
-					<h3>{bet}</h3>
-				</div>
-			</div>
-			<div className="cards-container">
-				<div className="dealer container">
-					<h2>DEALER {dealersSum} </h2>
-					{dealerCards.map((card, index) => (
-						<img
-							className={`card ${
-								index === dealerCards.length - 1
-									? "card-appear-animation card"
-									: "card"
-							}`}
-							key={card.id}
-							src={card.img}
-							alt=""
-						/>
-					))}
-				</div>
-				<div className="player container">
-					<h2>PLAYER {playersSum}</h2>
-					{playerCards.map((card) => (
-						<img
-							className={"card-appear-animation card"}
-							key={card.id}
-							src={card.img}
-							alt=""
-						/>
-					))}
-				</div>
-			</div>
+			<InfoBox
+				credits={credits}
+				lastWinCredits={lastWinCredits}
+				bet={bet}
+			/>
+			<Cards
+				dealerCards={dealerCards}
+				playerCards={playerCards}
+				dealerSum={dealerSum}
+				playerSum={playerSum}
+			/>
 			<h3 className="message">{gameStatus}</h3>
-			<div className="options-bar">
-				<button
-					disabled={playersSum === 0 || gameStatus !== ""}
-					onClick={() => {
-						const newCard = addCard();
-						setPlayerCards([...playerCards, newCard]);
-					}}
-				>
-					Hit
-				</button>
-				<button
-					disabled={playersSum === 0 || gameStatus !== ""}
-					onClick={handleStay}
-				>
-					Stay
-				</button>
-				<button
-					disabled={playersSum === 0 || gameStatus !== ""}
-					onClick={handleDouble}
-				>
-					Double
-				</button>
-			</div>
+			<OptionsBox
+				addCard={addCard}
+				playerSum={playerSum}
+				gameStatus={gameStatus}
+				handleStay={handleStay}
+				handleDouble={handleDouble}
+				playerCards={playerCards}
+				setPlayerCards={setPlayerCards}
+			/>
 			<div className="row-container">
-				<button className="play" onClick={startGame} disabled={bet === 0}>
+				<button
+					className="play"
+					onClick={startGame}
+					disabled={bet === 0}
+				>
 					Play
 				</button>
 			</div>
-			<div className="chips">
-				{credit - bet < 0 && (
-					<span>You can't play, decrease the bet amount</span>
-				)}
-				<div className="chip" data-value="10">
-					<img src="./img/10.png" alt="" onClick={() => setBet(10)} />
-				</div>
-				<div className="chip" data-value="20">
-					<img src="./img/20.png" alt="" onClick={() => setBet(20)} />
-				</div>
-				<div className="chip" data-value="50">
-					<img src="./img/50.png" alt="" onClick={() => setBet(50)} />
-				</div>
-				<div className="chip" data-value="100">
-					<img src="./img/100.png" alt="" onClick={() => setBet(100)} />
-				</div>
-			</div>
+			<Chips credits={credits} bet={bet} setBet={setBet} />
 		</div>
 	);
 }

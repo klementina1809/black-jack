@@ -13,12 +13,12 @@ const getCardsSum = (cards) => {
 };
 
 const getMessage = (
-	playersSum,
-	dealersSum,
+	playerSum,
+	dealerSum,
 	playerCardsLenght,
 	dealersCardLenght
 ) => {
-	if (playerCardsLenght === 2 && playersSum === 21) {
+	if (playerCardsLenght === 2 && playerSum === 21) {
 		// se il dealer ha il numero 10 o l'A
 		// allora controllare la prossima carta del dealer
 
@@ -32,29 +32,35 @@ const getMessage = (
 		// allora player win
 		return "player black jack, dealer lost";
 		// return gameStatues.PLAYER_BLACKJACK;
-	} else if (dealersCardLenght === 2 && dealersSum === 21)
+	} else if (
+		dealersCardLenght === 2 &&
+		dealerSum === 21 &&
+		playerSum !== 21
+	)
+		return "black jack push";
+	else if (dealersCardLenght === 2 && dealerSum === 21)
 		return "dealer black jack, player lost";
-	else if (playersSum > 21) return "player bust, dealer win";
-	else if (dealersSum > 21) return "dealer bust, player win";
-	else if (dealersSum >= 17 && dealersSum > playersSum) return "dealer win";
-	else if (dealersSum >= 17 && dealersSum < playersSum) return "player win";
-	else if (dealersSum >= 17 && dealersSum == playersSum) return "push";
+	else if (playerSum > 21) return "player bust, dealer win";
+	else if (dealerSum > 21) return "dealer bust, player win";
+	else if (dealerSum >= 17 && dealerSum > playerSum) return "dealer win";
+	else if (dealerSum >= 17 && dealerSum < playerSum) return "player win";
+	else if (dealerSum >= 17 && dealerSum == playerSum) return "push";
 	else return "";
 };
 
 const checkGameStatus = (playerCards, dealerCards) => {
-	const playersSum = getCardsSum(playerCards);
-	const dealersSum = getCardsSum(dealerCards);
+	const playerSum = getCardsSum(playerCards);
+	const dealerSum = getCardsSum(dealerCards);
 	const gameStatus = getMessage(
-		playersSum,
-		dealersSum,
+		playerSum,
+		dealerSum,
 		playerCards.length,
 		dealerCards.length
 	);
 
 	return {
-		playersSum,
-		dealersSum,
+		playerSum,
+		dealerSum,
 		gameStatus,
 	};
 };
