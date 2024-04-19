@@ -32,6 +32,7 @@ function App() {
 			setDealerSum(dSum);
 			setGameStatus(gStatus);
 		}
+		console.log('cards',cards);
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {
@@ -50,12 +51,16 @@ function App() {
 		return randomCard;
 	};
 
-	const addCard = () => {
-		const newCard = randomCardGenerate();
+	const removeCard = (newCard) => {
 		setCards((prevCards) => {
 			const newCards = prevCards.filter((card) => card.id !== newCard.id);
 			return newCards;
 		});
+	}
+
+	const addCard = () => {
+		const newCard = randomCardGenerate();
+		removeCard(newCard);
 		return newCard;
 	};
 
