@@ -33,7 +33,7 @@ function App() {
 			setDealerSum(dSum);
 			setGameStatus(gStatus);
 		}
-		console.log("cards", cards);
+		//console.log("cards", cards);
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {
@@ -65,26 +65,47 @@ function App() {
 		if (someone === "player") {
 			setPlayerCards([...playerCards, newCard]);
 		} else if (someone === "dealer") {
-			setDealerCards([...dealerCards, newCard]);
-		} else {
-			return newCard;
+			setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
 		}
+
+		return newCard;
 	};
 
 	const handleStay = () => {
 		setBtnsDisabled(true);
 		let sum = dealerSum;
+		let dealerCardsArray = [dealerCards[0].points];
 		const dealerDraw = () => {
 			if (sum < 17) {
 				setTimeout(() => {
-					const newCard = addCard();
-					setDealerCards((prevDealerCards) => [
-						...prevDealerCards,
-						newCard,
-					]);
-					sum += newCard.points;
+					const newCard = addCard("dealer");
+
+					if (newCard.rank === "A" && sum >= 11) {
+						dealerCardsArray.push(1);
+					} else {
+						dealerCardsArray.push(newCard.points);
+					}
+
+					sum += dealerCardsArray[dealerCardsArray.length - 1];
+
+					const aceIndex = dealerCardsArray.findIndex((el) => el === 11);
+
+					if (sum > 21 && aceIndex !== -1) {
+						dealerCardsArray[aceIndex] = 1;
+						sum -= 10;
+					}
+
+					if (sum < 17) dealerDraw();
+
+					/*
+					if (newCard.rank === "A" && sum >= 11) sum += 1;
+					else sum += newCard.points;
+
+					console.log("suuuum", sum);
+
 					// setDealerSum(sum);
 					if (sum < 17) dealerDraw();
+					*/
 				}, 600);
 			}
 		};
@@ -190,11 +211,7 @@ function App() {
 
 	return (
 		<div className="table-container">
-			<InfoBox
-				credits={credits}
-				lastWinCredits={lastWinCredits}
-				bet={bet}
-			/>
+			<InfoBox credits={credits} lastWinCredits={lastWinCredits} bet={bet} />
 			<Cards
 				dealerCards={dealerCards}
 				playerCards={playerCards}
@@ -211,11 +228,7 @@ function App() {
 				btnsDisabled={btnsDisabled}
 			/>
 			<div className="row-container">
-				<button
-					className="play"
-					onClick={startGame}
-					disabled={bet === 0}
-				>
+				<button className="play" onClick={startGame} disabled={bet === 0}>
 					Play
 				</button>
 			</div>
