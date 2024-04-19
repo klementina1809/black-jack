@@ -2,8 +2,6 @@ import React from "react";
 
 function OptionsBox({
 	addCard,
-	playerSum,
-	gameStatus,
 	handleStay,
 	handleDouble,
 	playerCards,
@@ -15,8 +13,8 @@ function OptionsBox({
 			<button
 				disabled={btnsDisabled}
 				onClick={() => {
-					const newCard = addCard();
-					setPlayerCards([...playerCards, newCard]);
+					const newCard = addCard('player');
+					// setPlayerCards([...playerCards, newCard]);
 				}}
 			>
 				Hit

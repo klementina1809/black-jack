@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import playingCards from "./helpers/Cards";
+import playingCards from "./helpers/CardsTry";
 import checkGameStatus from "./helpers/CheckGameStatus";
 
 import Chips from "./components/Chips";
@@ -33,7 +33,7 @@ function App() {
 			setDealerSum(dSum);
 			setGameStatus(gStatus);
 		}
-		console.log('cards',cards);
+		console.log("cards", cards);
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {
@@ -57,12 +57,18 @@ function App() {
 			const newCards = prevCards.filter((card) => card.id !== newCard.id);
 			return newCards;
 		});
-	}
+	};
 
-	const addCard = () => {
+	const addCard = (someone) => {
 		const newCard = randomCardGenerate();
 		removeCard(newCard);
-		return newCard;
+		if (someone === "player") {
+			setPlayerCards([...playerCards, newCard]);
+		} else if (someone === "dealer") {
+			setDealerCards([...dealerCards, newCard]);
+		} else {
+			return newCard;
+		}
 	};
 
 	const handleStay = () => {
@@ -77,7 +83,7 @@ function App() {
 						newCard,
 					]);
 					sum += newCard.points;
-					setDealerSum(sum);
+					// setDealerSum(sum);
 					if (sum < 17) dealerDraw();
 				}, 600);
 			}
@@ -133,19 +139,19 @@ function App() {
 		/*
 		switch (gameStatus) {
 			case "PLAYER_BLACKJACK":
-				wincreditss = 2.5 * bet;
+				winCredits = 2.5 * bet;
 				break;
 			case "DEALER_BLACKJACK":
 			case "DEALER_WIN":
 			case "PLAYER_BUST":
-				wincreditss = 0;
+				winCredits = 0;
 				break;
 			case "PLAYER_WIN":
 			case "DEALER_BUST":
-				wincreditss = 2 * bet;
+				winCredits = 2 * bet;
 				break;
 			case "PUSH":
-				wincreditss = bet;
+				winCredits = bet;
 				break;
 		}
 		*/
@@ -176,8 +182,9 @@ function App() {
 		setBet(bet * 2);
 		setBtnsDisabled(true);
 		setCredits((prev) => prev - bet * 2);
-		const newCard = addCard();
-		setPlayerCards([...playerCards, newCard]);
+		// const newCard =
+		addCard("player");
+		// setPlayerCards([...playerCards, newCard]);
 		handleStay();
 	};
 
@@ -197,8 +204,6 @@ function App() {
 			<h3 className="message">{gameStatus}</h3>
 			<OptionsBox
 				addCard={addCard}
-				playerSum={playerSum}
-				gameStatus={gameStatus}
 				handleStay={handleStay}
 				handleDouble={handleDouble}
 				playerCards={playerCards}
