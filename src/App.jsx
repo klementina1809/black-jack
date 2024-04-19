@@ -28,12 +28,11 @@ function App() {
 				playerSum: pSum,
 				dealerSum: dSum,
 				gameStatus: gStatus,
-			} = checkGameStatus(playerCards, dealerCards);
+			} = checkGameStatus(playerCards, dealerCards, gameStatuses);
 			setPlayerSum(pSum);
 			setDealerSum(dSum);
 			setGameStatus(gStatus);
 		}
-		//console.log("cards", cards);
 	}, [playerCards, dealerCards]);
 
 	useEffect(() => {
@@ -63,11 +62,10 @@ function App() {
 		const newCard = randomCardGenerate();
 		removeCard(newCard);
 		if (someone === "player") {
-			setPlayerCards([...playerCards, newCard]);
+			setPlayerCards((prevPlayerCards) => [...prevPlayerCards, newCard]);
 		} else if (someone === "dealer") {
 			setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
 		}
-
 		return newCard;
 	};
 
@@ -88,7 +86,9 @@ function App() {
 
 					sum += dealerCardsArray[dealerCardsArray.length - 1];
 
-					const aceIndex = dealerCardsArray.findIndex((el) => el === 11);
+					const aceIndex = dealerCardsArray.findIndex(
+						(el) => el === 11
+					);
 
 					if (sum > 21 && aceIndex !== -1) {
 						dealerCardsArray[aceIndex] = 1;
@@ -96,20 +96,21 @@ function App() {
 					}
 
 					if (sum < 17) dealerDraw();
-
-					/*
-					if (newCard.rank === "A" && sum >= 11) sum += 1;
-					else sum += newCard.points;
-
-					console.log("suuuum", sum);
-
-					// setDealerSum(sum);
-					if (sum < 17) dealerDraw();
-					*/
 				}, 600);
 			}
 		};
 		dealerDraw();
+		// se il dealer ha il numero 10 o l'A
+		// allora controllare la prossima carta del dealer
+
+		// se il dealer ha blackjack
+		// allora push
+
+		// se il dealer non ha blackjack
+		// allora player win
+
+		// se il dealer non ha il numero 10 o l'A
+		// allora player win
 	};
 
 	const resetGame = () => {
@@ -154,10 +155,20 @@ function App() {
 		setPlayerCards([playerCard1, playerCard2]);
 	};
 
-	const creditsCalculate = () => {
-		let message = gameStatus;
+	const gameStatuses = {
+		PLAYER_BLACKJACK: "player black jack, dealer lost",
+		DEALER_BLACKJACK: "dealer black jack, player lost",
+		BLACKJACK_PUSH: "black jack push",
+		PLAYER_BUST: "player bust, dealer win",
+		DEALER_BUST: "dealer bust, player win",
+		DEALER_WIN: "dealer win",
+		PLAYER_WIN: "player win",
+		PUSH: "push",
+	};
 
-		/*
+	const creditsCalculate = () => {
+		let winCredits = 0;
+
 		switch (gameStatus) {
 			case "PLAYER_BLACKJACK":
 				winCredits = 2.5 * bet;
@@ -172,28 +183,9 @@ function App() {
 				winCredits = 2 * bet;
 				break;
 			case "PUSH":
+			case "BLACKJACK_PUSH":
 				winCredits = bet;
 				break;
-		}
-		*/
-
-		let winCredits = 0;
-		if (
-			message === "Dealer win" ||
-			message === "player bust, player lost" ||
-			message === "dealer black jack, player lost"
-		) {
-			winCredits = 0;
-		} else if (
-			message === "Player win" ||
-			message === "dealer bust, player win" ||
-			message === "Player win and have black jack"
-		) {
-			winCredits = 2 * bet;
-		} else if (message === "player black jack, player win") {
-			winCredits = 2.5 * bet;
-		} else if (message === "push") {
-			winCredits = bet;
 		}
 		setLastWinCredits(winCredits);
 		setCredits((prev) => prev + winCredits);
@@ -203,15 +195,17 @@ function App() {
 		setBet(bet * 2);
 		setBtnsDisabled(true);
 		setCredits((prev) => prev - bet * 2);
-		// const newCard =
 		addCard("player");
-		// setPlayerCards([...playerCards, newCard]);
 		handleStay();
 	};
 
 	return (
 		<div className="table-container">
-			<InfoBox credits={credits} lastWinCredits={lastWinCredits} bet={bet} />
+			<InfoBox
+				credits={credits}
+				lastWinCredits={lastWinCredits}
+				bet={bet}
+			/>
 			<Cards
 				dealerCards={dealerCards}
 				playerCards={playerCards}
@@ -228,7 +222,11 @@ function App() {
 				btnsDisabled={btnsDisabled}
 			/>
 			<div className="row-container">
-				<button className="play" onClick={startGame} disabled={bet === 0}>
+				<button
+					className="play"
+					onClick={startGame}
+					disabled={bet === 0}
+				>
 					Play
 				</button>
 			</div>
