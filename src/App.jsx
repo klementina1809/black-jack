@@ -60,12 +60,10 @@ function App() {
 			if (sum < 17) {
 				setTimeout(() => {
 					const newCard = addCard();
-					setDealerCards([...dealerCards, newCard]);
+					setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
 					sum += newCard.points;
 					setDealersSum(sum);
-					if (sum < 17) {
-						dealerDraw();
-					}
+					if (sum < 17) dealerDraw();
 				}, 600);
 			}
 		};
