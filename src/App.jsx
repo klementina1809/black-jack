@@ -20,6 +20,7 @@ function App() {
 	const [bet, setBet] = useState(0);
 	const [credits, setCredits] = useState(1000);
 	const [lastWinCredits, setLastWinCredits] = useState(0);
+	const [btnsDisabled, setBtnsDisabled] = useState(true);
 
 	useEffect(() => {
 		if (playerCards.length > 0) {
@@ -39,6 +40,7 @@ function App() {
 		if (gameStatus !== "") {
 			creditsCalculate();
 			setBet(0);
+			setBtnsDisabled(true);
 		}
 	}, [gameStatus]);
 
@@ -65,6 +67,7 @@ function App() {
 	};
 
 	const handleStay = () => {
+		setBtnsDisabled(true);
 		let sum = dealerSum;
 		const dealerDraw = () => {
 			if (sum < 17) {
@@ -91,6 +94,7 @@ function App() {
 		setDealerSum(0);
 		setGameStatus("");
 		setLastWinCredits(0);
+		setBtnsDisabled(false);
 	};
 
 	const startGame = () => {
@@ -170,6 +174,7 @@ function App() {
 	};
 
 	const handleDouble = () => {
+		setBtnsDisabled(true);
 		setCredits((prev) => prev - bet * 2);
 		setBet(bet * 2);
 		const newCard = addCard();
@@ -199,6 +204,7 @@ function App() {
 				handleDouble={handleDouble}
 				playerCards={playerCards}
 				setPlayerCards={setPlayerCards}
+				btnsDisabled={btnsDisabled}
 			/>
 			<div className="row-container">
 				<button

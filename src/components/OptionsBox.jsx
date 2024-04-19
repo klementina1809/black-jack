@@ -8,11 +8,12 @@ function OptionsBox({
 	handleDouble,
 	playerCards,
 	setPlayerCards,
+  btnsDisabled
 }) {
 	return (
 		<div className="options-bar">
 			<button
-				disabled={playerSum === 0 || gameStatus !== ""}
+				disabled={btnsDisabled}
 				onClick={() => {
 					const newCard = addCard();
 					setPlayerCards([...playerCards, newCard]);
@@ -21,13 +22,13 @@ function OptionsBox({
 				Hit
 			</button>
 			<button
-				disabled={playerSum === 0 || gameStatus !== ""}
+				disabled={btnsDisabled}
 				onClick={handleStay}
 			>
 				Stay
 			</button>
 			<button
-				disabled={playerSum === 0 || gameStatus !== ""}
+				disabled={btnsDisabled}
 				onClick={handleDouble}
 			>
 				Double
