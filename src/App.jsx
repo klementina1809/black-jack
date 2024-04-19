@@ -39,7 +39,6 @@ function App() {
 	useEffect(() => {
 		if (gameStatus !== "") {
 			creditsCalculate();
-			setBet(0);
 			setBtnsDisabled(true);
 		}
 	}, [gameStatus]);
@@ -174,9 +173,9 @@ function App() {
 	};
 
 	const handleDouble = () => {
+		setBet(bet * 2);
 		setBtnsDisabled(true);
 		setCredits((prev) => prev - bet * 2);
-		setBet(bet * 2);
 		const newCard = addCard();
 		setPlayerCards([...playerCards, newCard]);
 		handleStay();
