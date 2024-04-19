@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import playingCards from "./components/Cards";
-import checkGameStatus from "./components/CheckGameStatus";
+import playingCards from "./helpers/Cards";
+import checkGameStatus from "./helpers/CheckGameStatus";
 
 import "./App.css";
 
@@ -59,15 +59,10 @@ function App() {
 				setTimeout(() => {
 					const newCard = randomCardGenerate();
 					setCards((prevCards) => {
-						const newCards = prevCards.filter(
-							(card) => card.id !== newCard.id
-						);
+						const newCards = prevCards.filter((card) => card.id !== newCard.id);
 						return newCards;
 					});
-					setDealerCards((prevDealerCards) => [
-						...prevDealerCards,
-						newCard,
-					]);
+					setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
 					sum += newCard.points;
 					setDealersSum(sum);
 					dealerDraw(); // Рекурсивный вызов для следующей карты
@@ -160,7 +155,7 @@ function App() {
 			</div>
 			<div className="cards-container">
 				<div className="dealer container">
-					<h2>DEALER {' '} {dealersSum} </h2>
+					<h2>DEALER {dealersSum} </h2>
 					{dealerCards.map((card, index) => (
 						<img
 							className={`card ${
@@ -208,11 +203,7 @@ function App() {
 				</button>
 			</div>
 			<div className="row-container">
-				<button
-					className="play"
-					onClick={startGame}
-					disabled={bet === 0}
-				>
+				<button className="play" onClick={startGame} disabled={bet === 0}>
 					Play
 				</button>
 			</div>
@@ -230,11 +221,7 @@ function App() {
 					<img src="./img/50.png" alt="" onClick={() => setBet(50)} />
 				</div>
 				<div className="chip" data-value="100">
-					<img
-						src="./img/100.png"
-						alt=""
-						onClick={() => setBet(100)}
-					/>
+					<img src="./img/100.png" alt="" onClick={() => setBet(100)} />
 				</div>
 			</div>
 		</div>
