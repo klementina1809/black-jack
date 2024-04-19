@@ -31,6 +31,7 @@ const getMessage = (
 		// se il dealer non ha il numero 10 o l'A
 		// allora player win
 		return "player black jack, dealer lost";
+		// return gameStatues.PLAYER_BLACKJACK;
 	} else if (dealersCardLenght === 2 && dealersSum === 21)
 		return "dealer black jack, player lost";
 	else if (playersSum > 21) return "player bust, dealer win";
@@ -38,6 +39,7 @@ const getMessage = (
 	else if (dealersSum >= 17 && dealersSum > playersSum) return "dealer win";
 	else if (dealersSum >= 17 && dealersSum < playersSum) return "player win";
 	else if (dealersSum >= 17 && dealersSum == playersSum) return "push";
+	else return "";
 };
 
 const checkGameStatus = (playerCards, dealerCards) => {
@@ -58,3 +60,13 @@ const checkGameStatus = (playerCards, dealerCards) => {
 };
 
 export default checkGameStatus;
+
+const gameStatues = {
+	PLAYER_BLACKJACK: "PLAYER_BLACKJACK",
+	DEALER_BLACKJACK: "DEALER_BLACKJACK",
+	PLAYER_BUST: "PLAYER_BUST",
+	DEALER_BUST: "DEALER_BUST",
+	DEALER_WIN: "DEALER_WIN",
+	PLAYER_WIN: "PLAYER_WIN",
+	PUSH: "PUSH",
+};

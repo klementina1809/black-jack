@@ -31,18 +31,18 @@ function App() {
 
 	useEffect(() => {
 		if (gameStatus !== "") {
-			creditsCalculate(gameStatus);
+			creditsCalculate();
 			setBet(0);
 		}
 	}, [gameStatus]);
 
 	const randomCardGenerate = () => {
 		const randomId = Math.floor(Math.random() * 51);
-		const newRandomCard = cards.find((card) => card.id === randomId);
-		if (!newRandomCard) {
+		const randomCard = cards.find((card) => card.id === randomId);
+		if (!randomCard) {
 			return randomCardGenerate();
 		}
-		return newRandomCard;
+		return randomCard;
 	};
 
 	const addCard = () => {
@@ -51,7 +51,7 @@ function App() {
 			const newCards = prevCards.filter((card) => card.id !== newCard.id);
 			return newCards;
 		});
-		setPlayerCards([...playerCards, newCard]);
+		return newCard;
 	};
 
 	const handleStay = () => {
@@ -59,57 +59,84 @@ function App() {
 		const dealerDraw = () => {
 			if (sum < 17) {
 				setTimeout(() => {
-					const newCard = randomCardGenerate();
-					setCards((prevCards) => {
-						const newCards = prevCards.filter((card) => card.id !== newCard.id);
-						return newCards;
-					});
-					setDealerCards((prevDealerCards) => [...prevDealerCards, newCard]);
+					const newCard = addCard();
+					setDealerCards([...dealerCards, newCard]);
 					sum += newCard.points;
 					setDealersSum(sum);
-					dealerDraw(); // Рекурсивный вызов для следующей карты
+					if (sum < 17) {
+						dealerDraw();
+					}
 				}, 600);
 			}
 		};
-		dealerDraw(); // Начать рекурсивный процесс
+		dealerDraw();
+	};
+
+	const resetGame = () => {
+		setCards(playingCards);
+		setDealerCards([]);
+		setPlayerCards([]);
+		setPlayersSum(0);
+		setDealersSum(0);
+		setGameStatus("");
+		setWin(0);
 	};
 
 	const startGame = () => {
-		setCards(playingCards);
+		resetGame();
 		setCredit((prev) => prev - bet);
-		setGameStatus("");
-		setWin(0);
-		setDealersSum(0);
-		setDealersSum(0);
-		let cardForDealer, card1ForPlayer, card2ForPlayer;
+
+		let dealerCard, playerCard1, playerCard2;
+
+		dealerCard = randomCardGenerate();
 
 		do {
-			cardForDealer = randomCardGenerate();
-			card1ForPlayer = randomCardGenerate();
-			card2ForPlayer = randomCardGenerate();
+			playerCard1 = randomCardGenerate();
+			playerCard2 = randomCardGenerate();
 		} while (
-			cardForDealer.id === card1ForPlayer.id ||
-			cardForDealer.id === card2ForPlayer.id ||
-			card1ForPlayer.id === card2ForPlayer.id
+			dealerCard.id === playerCard1.id ||
+			dealerCard.id === playerCard2.id ||
+			playerCard1.id === playerCard2.id
 		);
-
-		setDealerCards([cardForDealer]);
 
 		setCards((prevCards) => {
 			const newCards = prevCards.filter(
 				(card) =>
-					card.id !== cardForDealer.id &&
-					card.id !== card1ForPlayer.id &&
-					card.id !== card2ForPlayer.id
+					card.id !== dealerCard.id &&
+					card.id !== playerCard1.id &&
+					card.id !== playerCard2.id
 			);
 			return newCards;
 		});
 
-		setPlayerCards([card1ForPlayer, card2ForPlayer]);
+		setDealerCards([dealerCard]);
+		setPlayerCards([playerCard1, playerCard2]);
 	};
 
-	const creditsCalculate = (message) => {
-		let newCredits;
+	const creditsCalculate = () => {
+		let message = gameStatus;
+
+		/*
+		switch (gameStatus) {
+			case "PLAYER_BLACKJACK":
+				winCredits = 2.5 * bet;
+				break;
+			case "DEALER_BLACKJACK":
+			case "DEALER_WIN":
+			case "PLAYER_BUST":
+				winCredits = 0;
+				break;
+			case "PLAYER_WIN":
+			case "DEALER_BUST":
+				winCredits = 2 * bet;
+				break;
+			case "PUSH":
+				winCredits = bet;
+				break;
+		}
+		*/
+
+		let newCredits = 0;
 		if (
 			message === "Dealer win" ||
 			message === "player bust, player lost" ||
@@ -127,15 +154,15 @@ function App() {
 		} else if (message === "push") {
 			newCredits = bet;
 		}
-		console.log("newCredits", newCredits);
 		setWin(newCredits);
 		setCredit((prev) => prev + newCredits);
 	};
 
 	const handleDouble = () => {
-		setBet((prev) => prev * 2);
-		setCredit((prev) => prev - bet);
-		addCard();
+		setCredit((prev) => prev - bet * 2);
+		setBet(bet * 2);
+		const newCard = addCard();
+		setPlayerCards([...playerCards, newCard]);
 		handleStay();
 	};
 
@@ -187,7 +214,10 @@ function App() {
 			<div className="options-bar">
 				<button
 					disabled={playersSum === 0 || gameStatus !== ""}
-					onClick={addCard}
+					onClick={() => {
+						const newCard = addCard();
+						setPlayerCards([...playerCards, newCard]);
+					}}
 				>
 					Hit
 				</button>
