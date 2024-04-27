@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import playingCards from "./helpers/CardsTry";
+import playingCards from "./helpers/Cards";
 import checkGameStatus from "./helpers/CheckGameStatus";
 
 import Chips from "./components/Chips";
