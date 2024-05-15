@@ -13,3 +13,6 @@ This React-based project is an implementation of the classic card game, Blackjac
 ![Static Badge](https://img.shields.io/badge/HTML5-ffffff?style=social&logo=HTML5)
 ![Static Badge](https://img.shields.io/badge/CSS3-ffffff?style=social&logo=CSS3)
 ![Static Badge](https://img.shields.io/badge/JavaScript-ffffff?style=social&logo=JavaScript)
+
+### Other Links:
+- [Playing Cards](https://opengameart.org/content/playing-cards-vector-png)
